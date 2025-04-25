@@ -13,26 +13,26 @@ export default function Header({ userId }: HeaderProps) {
   });
 
   return (
-    <header className="bg-primary shadow-md">
+    <header className="bg-gradient-to-r from-primary to-primary-light shadow-md">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <Link href="/">
-          <a className="flex items-center">
-            <Gamepad className="text-white mr-2 h-6 w-6" />
-            <h1 className="text-white font-nunito font-bold text-2xl">GameFocus</h1>
-          </a>
+          <div className="flex items-center cursor-pointer">
+            <Gamepad className="text-white mr-2 h-7 w-7" />
+            <h1 className="text-white font-nunito font-bold text-2xl">ФокусИгра</h1>
+          </div>
         </Link>
         
-        <div className="flex items-center space-x-2">
-          <div className="flex items-center bg-primary-dark rounded-full px-3 py-1">
-            <span className="coin text-xl text-accent mr-1">⭐</span>
+        <div className="flex items-center space-x-3">
+          <div className="flex items-center bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 shadow-inner">
+            <span className="coin text-xl text-accent mr-2">⭐</span>
             {isLoading ? (
               <Skeleton className="h-6 w-16 bg-primary-light/50" />
             ) : (
-              <span className="text-white font-bold">{user?.coins || 0}</span>
+              <span className="text-white font-bold text-lg">{user?.coins || 0} монет</span>
             )}
           </div>
           
-          <button className="rounded-full w-10 h-10 bg-primary-dark flex items-center justify-center">
+          <button className="rounded-full w-11 h-11 bg-white/20 hover:bg-white/30 transition-colors flex items-center justify-center shadow-inner">
             <User className="text-white h-5 w-5" />
           </button>
         </div>

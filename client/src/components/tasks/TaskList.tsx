@@ -38,14 +38,14 @@ export default function TaskList({ tasks, userId, showCompleted = true, onDelete
       queryClient.invalidateQueries({ queryKey: [`/api/user/${userId}`] });
       
       toast({
-        title: "Task completed!",
-        description: `You earned ${data.coinReward} coins.`,
+        title: "Задача выполнена!",
+        description: `Вы заработали ${data.coinReward} монет.`,
       });
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to complete task.",
+        title: "Ошибка",
+        description: "Не удалось выполнить задачу.",
         variant: "destructive",
       });
     }
@@ -59,8 +59,8 @@ export default function TaskList({ tasks, userId, showCompleted = true, onDelete
       queryClient.invalidateQueries({ queryKey: [`/api/user/${userId}/tasks`] });
       
       toast({
-        title: "Task deleted",
-        description: "The task has been deleted successfully.",
+        title: "Задача удалена",
+        description: "Задача была успешно удалена.",
       });
       
       if (onDeleteTask) {
@@ -69,8 +69,8 @@ export default function TaskList({ tasks, userId, showCompleted = true, onDelete
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to delete task.",
+        title: "Ошибка",
+        description: "Не удалось удалить задачу.",
         variant: "destructive",
       });
     }
@@ -97,7 +97,7 @@ export default function TaskList({ tasks, userId, showCompleted = true, onDelete
     return (
       <Card>
         <CardContent className="py-6 text-center text-gray-500">
-          No tasks available. Create some tasks to get started!
+          Нет доступных задач. Создайте задачи, чтобы начать!
         </CardContent>
       </Card>
     );
@@ -117,26 +117,26 @@ export default function TaskList({ tasks, userId, showCompleted = true, onDelete
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.3 }}
-          className={`task-card bg-white rounded-xl p-4 shadow-md ${
-            task.isCompleted ? "opacity-70" : ""
+          className={`task-card bg-white rounded-xl p-4 shadow-md border border-gray-100 ${
+            task.isCompleted ? "opacity-80" : ""
           }`}
         >
           <div className="flex items-center">
             <div className="flex-shrink-0 mr-3">
               {task.isCompleted ? (
-                <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-white border-2 border-secondary">
-                  <Check className="h-3 w-3" />
+                <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center text-white border-2 border-secondary shadow-sm">
+                  <Check className="h-4 w-4" />
                 </div>
               ) : (
                 <button 
-                  className="w-6 h-6 rounded-full border-2 border-primary hover:bg-primary/10 transition-colors"
+                  className="w-7 h-7 rounded-full border-2 border-primary hover:bg-primary/10 transition-all shadow-sm"
                   onClick={(e) => completeTask(task.id, task.coinReward, e)}
                 />
               )}
             </div>
             <div className="flex-1">
               <h3 className={`font-medium text-gray-800 ${
-                task.isCompleted ? "line-through" : ""
+                task.isCompleted ? "line-through text-gray-500" : ""
               }`}>
                 {task.title}
               </h3>
@@ -145,7 +145,7 @@ export default function TaskList({ tasks, userId, showCompleted = true, onDelete
                 <span>
                   {task.dueDate 
                     ? `${formatTimeOnly(task.dueDate)}`
-                    : "No due date"}
+                    : "Нет срока"}
                 </span>
                 <span className="mx-2">•</span>
                 <span className="flex items-center font-medium text-accent">
@@ -155,13 +155,13 @@ export default function TaskList({ tasks, userId, showCompleted = true, onDelete
             </div>
             <div className="flex-shrink-0 ml-2">
               {task.isCompleted ? (
-                <span className="text-xs font-medium py-1 px-2 bg-secondary/10 text-secondary rounded-full">
-                  Completed
+                <span className="text-xs font-medium py-1 px-3 bg-secondary/10 text-secondary rounded-full">
+                  Выполнено
                 </span>
               ) : (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="text-gray-400 hover:text-primary">
+                    <button className="text-gray-400 hover:text-primary transition-colors p-1 rounded-full hover:bg-gray-50">
                       <MoreVertical className="h-5 w-5" />
                     </button>
                   </DropdownMenuTrigger>
@@ -170,7 +170,7 @@ export default function TaskList({ tasks, userId, showCompleted = true, onDelete
                       className="text-destructive cursor-pointer"
                       onClick={() => deleteTask(task.id)}
                     >
-                      Delete
+                      Удалить
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

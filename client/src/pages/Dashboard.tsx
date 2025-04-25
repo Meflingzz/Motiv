@@ -55,8 +55,10 @@ export default function Dashboard({ userId }: DashboardProps) {
       
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="font-nunito font-bold text-xl text-gray-800">Current Tasks</h2>
-          <a href="/tasks" className="text-primary font-medium text-sm">View All</a>
+          <h2 className="font-nunito font-bold text-xl text-gray-800">Текущие задачи</h2>
+          <a href="/tasks" className="text-primary font-medium text-sm hover:text-primary-dark transition-colors flex items-center">
+            Все задачи <span className="ml-1">→</span>
+          </a>
         </div>
         <TaskList 
           tasks={displayTasks} 
@@ -69,11 +71,13 @@ export default function Dashboard({ userId }: DashboardProps) {
         {/* Rewards Section */}
         <div>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="font-nunito font-bold text-xl text-gray-800">Rewards</h2>
-            <a href="/rewards" className="text-primary font-medium text-sm">View All</a>
+            <h2 className="font-nunito font-bold text-xl text-gray-800">Награды</h2>
+            <a href="/rewards" className="text-primary font-medium text-sm hover:text-primary-dark transition-colors flex items-center">
+              Все награды <span className="ml-1">→</span>
+            </a>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-4">
             {rewards.slice(0, 3).map((reward) => (
               <RewardCard
                 key={reward.id}
@@ -87,14 +91,16 @@ export default function Dashboard({ userId }: DashboardProps) {
         {/* Mini-Games Section */}
         <div>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="font-nunito font-bold text-xl text-gray-800">Mini-Games</h2>
-            <a href="/mini-games" className="text-primary font-medium text-sm">View All</a>
+            <h2 className="font-nunito font-bold text-xl text-gray-800">Мини-игры</h2>
+            <a href="/mini-games" className="text-primary font-medium text-sm hover:text-primary-dark transition-colors flex items-center">
+              Все игры <span className="ml-1">→</span>
+            </a>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-4">
             <MiniGameCard
-              title="Memory Match"
-              description="Test your memory skills"
+              title="Игра на память"
+              description="Проверьте свою память"
               icon="Brain"
               color="primary"
               maxCoins={20}
@@ -102,8 +108,8 @@ export default function Dashboard({ userId }: DashboardProps) {
             />
             
             <MiniGameCard
-              title="Reaction Time"
-              description="Test your reflexes"
+              title="Скорость реакции"
+              description="Проверьте свою реакцию"
               icon="Zap"
               color="secondary"
               maxCoins={15}
