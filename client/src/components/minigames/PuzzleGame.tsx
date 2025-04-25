@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Timer, Award, RefreshCw } from "lucide-react";
+import { ChevronLeft, Timer, Award, RefreshCw, Coins } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -134,13 +134,15 @@ export default function PuzzleGame({ onClose }: PuzzleGameProps) {
     mutationFn: async (data: { gameType: string; score: number }) => {
       return await apiRequest("POST", "/api/mini-game-scores", data);
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/user/1/mini-game-scores"] });
-      setCoinsEarned(data.coinsEarned);
+      if (data && typeof data.coinsEarned === 'number') {
+        setCoinsEarned(data.coinsEarned);
+      }
       
       toast({
         title: "Счет сохранен!",
-        description: `Вы заработали ${data.coinsEarned} монет.`,
+        description: `Вы заработали ${data && data.coinsEarned ? data.coinsEarned : 0} монет.`,
       });
     },
     onError: () => {
@@ -222,27 +224,38 @@ export default function PuzzleGame({ onClose }: PuzzleGameProps) {
     <div className="puzzle-game">
       {isGameOver ? (
         <div className="p-6 text-center">
-          <Award className="h-16 w-16 mx-auto text-accent mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Поздравляем!</h2>
-          <p className="mb-4">Вы решили головоломку за {moves} ходов и {formatTime(timer)}.</p>
-          
-          <div className="flex justify-center space-x-4 mb-6">
-            <div className="bg-gray-100 rounded-lg p-3 text-center min-w-[100px]">
-              <div className="text-2xl font-bold">{score}</div>
-              <div className="text-xs text-gray-500">Очки</div>
+          <div className="relative mb-8">
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-amber-300 via-amber-400 to-amber-300 h-10 w-10 rounded-full flex items-center justify-center z-10 shadow-md">
+              <Award className="h-5 w-5 text-white" />
             </div>
-            
-            <div className="bg-accent/10 rounded-lg p-3 text-center text-accent min-w-[100px]">
-              <div className="text-2xl font-bold">{coinsEarned}</div>
-              <div className="text-xs">Монеты</div>
+            <div className="pt-5 pb-4 px-5 bg-amber-50 rounded-xl border border-amber-100">
+              <h2 className="text-xl font-bold text-amber-800 mb-1">Поздравляем!</h2>
+              <p className="text-sm text-amber-700 mb-1">
+                Вы решили головоломку за <span className="font-semibold">{moves} ходов</span> и <span className="font-semibold">{formatTime(timer)}</span>
+              </p>
             </div>
           </div>
           
-          <div className="flex justify-center space-x-2">
-            <Button variant="outline" onClick={onClose}>
+          <div className="flex justify-center space-x-4 mb-8">
+            <div className="bg-gray-50 border border-gray-100 rounded-lg p-4 text-center min-w-[110px] shadow-sm">
+              <div className="text-2xl font-bold text-gray-700">{score}</div>
+              <div className="text-xs text-gray-500 font-medium">Очки</div>
+            </div>
+            
+            <div className="bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-lg p-4 text-center min-w-[110px] shadow-sm">
+              <div className="text-2xl font-bold text-amber-600 flex items-center justify-center">
+                <Coins className="h-5 w-5 mr-1" />
+                {coinsEarned}
+              </div>
+              <div className="text-xs text-amber-600 font-medium">Монеты</div>
+            </div>
+          </div>
+          
+          <div className="flex justify-center space-x-3">
+            <Button variant="outline" onClick={onClose} className="px-5">
               Закрыть
             </Button>
-            <Button onClick={restartGame}>
+            <Button onClick={restartGame} className="bg-amber-500 hover:bg-amber-600 text-white px-5">
               Играть снова
             </Button>
           </div>
@@ -280,16 +293,17 @@ export default function PuzzleGame({ onClose }: PuzzleGameProps) {
                 {puzzle.map((value, index) => (
                   <motion.div
                     key={value}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0 }}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className={`aspect-square rounded-md flex items-center justify-center text-xl font-bold ${
+                    whileHover={value !== 0 ? { scale: canMove(index, puzzle) ? 1.05 : 1 } : {}}
+                    className={`aspect-square rounded-lg flex items-center justify-center text-xl font-bold shadow-sm ${
                       value === 0 
                         ? "bg-transparent" 
                         : canMove(index, puzzle)
-                          ? "bg-primary/80 text-white cursor-pointer hover:bg-primary"
-                          : "bg-primary-light/60 text-white"
+                          ? "bg-gradient-to-br from-amber-400 to-amber-600 text-white cursor-pointer hover:shadow-md"
+                          : "bg-gradient-to-br from-amber-300 to-amber-500 text-white"
                     }`}
                     onClick={() => moveTile(index)}
                   >
@@ -299,9 +313,12 @@ export default function PuzzleGame({ onClose }: PuzzleGameProps) {
               </AnimatePresence>
             </div>
             
-            <div className="text-center mt-5 text-gray-500 text-sm">
-              Нажимайте на ячейки, чтобы перемещать их в пустые места. <br />
-              Соберите числа по порядку от 1 до 15.
+            <div className="text-center mt-6 bg-amber-50 p-3 rounded-lg border border-amber-100 text-amber-800 text-sm">
+              <p className="mb-1 font-medium">Как играть:</p>
+              <p className="text-xs">
+                Нажимайте на ячейки рядом с пустой клеткой, чтобы перемещать их.<br />
+                Соберите числа по порядку от 1 до 15.
+              </p>
             </div>
           </div>
         </>

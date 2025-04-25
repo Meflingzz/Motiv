@@ -87,8 +87,8 @@ export default function MiniGameCard({
               {iconMap[icon]}
             </div>
             <div className="w-2/3 p-4">
-              <h3 className="font-medium font-nunito">{title}</h3>
-              <p className="text-sm text-gray-500 mb-2">{description}</p>
+              <h3 className="font-medium font-nunito text-md mb-1">{title}</h3>
+              <p className="text-xs text-gray-500 mb-3 line-clamp-2 h-9">{description}</p>
               <div className="flex justify-between items-center">
                 <span className={`text-xs ${classes.badge} px-2 py-1 rounded-full flex items-center`}>
                   <Coins className="h-3 w-3 mr-1" /> До {maxCoins} монет
