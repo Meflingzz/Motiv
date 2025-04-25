@@ -50,11 +50,23 @@ export default function MiniGames({ userId }: MiniGamesProps) {
              scoreDate.getFullYear() === today.getFullYear();
     });
     
+  const todaysPuzzleScores = scores
+    .filter((score: any) => {
+      const scoreDate = new Date(score.createdAt);
+      const today = new Date();
+      return score.gameType === "puzzle" && 
+             scoreDate.getDate() === today.getDate() &&
+             scoreDate.getMonth() === today.getMonth() &&
+             scoreDate.getFullYear() === today.getFullYear();
+    });
+    
   const memoryPlaysToday = todaysMemoryScores.length;
   const reactionPlaysToday = todaysReactionScores.length;
+  const puzzlePlaysToday = todaysPuzzleScores.length;
   
   const memoryCoinsToday = todaysMemoryScores.reduce((sum: number, score: any) => sum + score.coinsEarned, 0);
   const reactionCoinsToday = todaysReactionScores.reduce((sum: number, score: any) => sum + score.coinsEarned, 0);
+  const puzzleCoinsToday = todaysPuzzleScores.reduce((sum: number, score: any) => sum + score.coinsEarned, 0);
   
   return (
     <div className="max-w-4xl mx-auto">
@@ -79,6 +91,8 @@ export default function MiniGames({ userId }: MiniGamesProps) {
         <MemoryGame onClose={() => setActiveGame(null)} />
       ) : activeGame === "reaction" ? (
         <ReactionGame onClose={() => setActiveGame(null)} />
+      ) : activeGame === "puzzle" ? (
+        <PuzzleGame onClose={() => setActiveGame(null)} />
       ) : (
         <div className="grid md:grid-cols-2 gap-5">
           <div>
@@ -146,6 +160,42 @@ export default function MiniGames({ userId }: MiniGamesProps) {
                       <Coins className="h-4 w-4 text-accent mb-1" />
                       <p className="text-gray-500 text-xs">Монет сегодня</p>
                       <p className="font-medium">{reactionCoinsToday}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+          
+          <div>
+            <div className="mb-4">
+              <MiniGameCard
+                title="Пятнашки"
+                description="Расставьте числа по порядку"
+                icon="Puzzle"
+                color="amber"
+                maxCoins={25}
+                gameType="puzzle"
+                onPlay={() => setActiveGame("puzzle")}
+              />
+              
+              <Card className="mt-4 border border-gray-100">
+                <CardContent className="py-5">
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div className="flex flex-col items-center bg-gray-50 p-3 rounded-lg">
+                      <Trophy className="h-4 w-4 text-amber-600 mb-1" />
+                      <p className="text-gray-500 text-xs">Лучший счет</p>
+                      <p className="font-medium">{puzzleBestScore} очков</p>
+                    </div>
+                    <div className="flex flex-col items-center bg-gray-50 p-3 rounded-lg">
+                      <Calendar className="h-4 w-4 text-amber-600 mb-1" />
+                      <p className="text-gray-500 text-xs">Игр сегодня</p>
+                      <p className="font-medium">{puzzlePlaysToday}/3</p>
+                    </div>
+                    <div className="flex flex-col items-center bg-gray-50 p-3 rounded-lg">
+                      <Coins className="h-4 w-4 text-accent mb-1" />
+                      <p className="text-gray-500 text-xs">Монет сегодня</p>
+                      <p className="font-medium">{puzzleCoinsToday}</p>
                     </div>
                   </div>
                 </CardContent>
