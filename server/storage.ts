@@ -1,13 +1,3 @@
-import {
-  users, tasks, dailyGoals, rewards, miniGameScores,
-  type User, type InsertUser,
-  type Task, type InsertTask,
-  type DailyGoal, type InsertDailyGoal,
-  type Reward, type InsertReward,
-  type MiniGameScore, type InsertMiniGameScore,
-  DEFAULT_DAILY_GOALS, DEFAULT_REWARDS
-} from "@shared/schema";
-
 export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
@@ -39,152 +29,64 @@ export interface IStorage {
   createMiniGameScore(score: InsertMiniGameScore): Promise<MiniGameScore>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private tasks: Map<number, Task>;
-  private dailyGoals: Map<number, DailyGoal>;
-  private rewards: Map<number, Reward>;
-  private miniGameScores: Map<number, MiniGameScore>;
-  
-  private userIdCounter: number;
-  private taskIdCounter: number;
-  private goalIdCounter: number;
-  private rewardIdCounter: number;
-  private scoreIdCounter: number;
+import { users, tasks, dailyGoals, rewards, miniGameScores } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, gte, lte, desc } from "drizzle-orm";
+import { User, InsertUser, Task, InsertTask, DailyGoal, InsertDailyGoal, Reward, InsertReward, MiniGameScore, InsertMiniGameScore } from "@shared/schema";
 
-  constructor() {
-    this.users = new Map();
-    this.tasks = new Map();
-    this.dailyGoals = new Map();
-    this.rewards = new Map();
-    this.miniGameScores = new Map();
-    
-    this.userIdCounter = 1;
-    this.taskIdCounter = 1;
-    this.goalIdCounter = 1;
-    this.rewardIdCounter = 1;
-    this.scoreIdCounter = 1;
-    
-    // Create demo user
-    this.createUser({ username: "demo", password: "password" }).then(user => {
-      // Add some sample tasks
-      this.createTask({
-        userId: user.id,
-        title: "Complete JavaScript course module",
-        description: "Finish the advanced function chapter",
-        dueDate: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours from now
-        coinReward: 30
-      });
-      
-      this.createTask({
-        userId: user.id,
-        title: "Work on portfolio project",
-        description: "Fix responsive layout issues",
-        dueDate: new Date(Date.now() + 4.5 * 60 * 60 * 1000), // 4.5 hours from now
-        coinReward: 45
-      });
-      
-      // Add a completed task
-      this.createTask({
-        userId: user.id,
-        title: "Morning Workout",
-        description: "30 minutes cardio",
-        dueDate: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
-        coinReward: 25
-      }).then(task => {
-        this.completeTask(task.id);
-        this.updateUserCoins(user.id, user.coins + task.coinReward);
-      });
-      
-      // Add default daily goals
-      DEFAULT_DAILY_GOALS.forEach(goal => {
-        this.createDailyGoal({
-          userId: user.id,
-          title: goal.title,
-          icon: goal.icon
-        });
-      });
-      
-      // Add default rewards
-      DEFAULT_REWARDS.forEach(reward => {
-        this.createReward({
-          userId: user.id,
-          title: reward.title,
-          description: reward.description,
-          icon: reward.icon,
-          duration: reward.duration,
-          coinCost: reward.coinCost
-        });
-      });
-      
-      // Mark some daily goals as completed
-      this.getDailyGoals(user.id).then(goals => {
-        if (goals.length >= 3) {
-          this.completeDailyGoal(goals[0].id);
-          this.completeDailyGoal(goals[1].id);
-          this.completeDailyGoal(goals[2].id);
-        }
-      });
-      
-      // Add coins to user
-      this.updateUserCoins(user.id, 285);
-    });
-  }
-
+// Класс для хранения в базе данных
+export class DatabaseStorage implements IStorage {
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.userIdCounter++;
-    const user: User = { 
-      ...insertUser, 
-      id, 
-      coins: 0, 
-      streak: 0,
-      lastLogin: new Date() 
-    };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
-  
+
   async updateUserCoins(userId: number, coins: number): Promise<User | undefined> {
     const user = await this.getUser(userId);
     if (!user) return undefined;
+
+    const [updatedUser] = await db
+      .update(users)
+      .set({ coins: user.coins + coins })
+      .where(eq(users.id, userId))
+      .returning();
     
-    const updatedUser = { ...user, coins };
-    this.users.set(userId, updatedUser);
     return updatedUser;
   }
 
   // Task methods
   async getTasks(userId: number): Promise<Task[]> {
-    return Array.from(this.tasks.values()).filter(
-      (task) => task.userId === userId
-    );
+    return await db
+      .select()
+      .from(tasks)
+      .where(eq(tasks.userId, userId))
+      .orderBy(desc(tasks.createdAt));
   }
 
   async getTask(id: number): Promise<Task | undefined> {
-    return this.tasks.get(id);
+    const [task] = await db.select().from(tasks).where(eq(tasks.id, id));
+    return task || undefined;
   }
 
   async createTask(insertTask: InsertTask): Promise<Task> {
-    const id = this.taskIdCounter++;
-    const task: Task = {
-      ...insertTask,
-      id,
-      isCompleted: false,
-      completedAt: null,
-      createdAt: new Date()
-    };
-    this.tasks.set(id, task);
+    const [task] = await db
+      .insert(tasks)
+      .values(insertTask)
+      .returning();
     return task;
   }
 
@@ -192,116 +94,138 @@ export class MemStorage implements IStorage {
     const task = await this.getTask(id);
     if (!task) return undefined;
 
-    const updatedTask = { ...task, ...taskUpdate };
-    this.tasks.set(id, updatedTask);
+    const [updatedTask] = await db
+      .update(tasks)
+      .set(taskUpdate)
+      .where(eq(tasks.id, id))
+      .returning();
+    
     return updatedTask;
   }
 
   async deleteTask(id: number): Promise<boolean> {
-    return this.tasks.delete(id);
+    const result = await db
+      .delete(tasks)
+      .where(eq(tasks.id, id))
+      .returning({ id: tasks.id });
+
+    return result.length > 0;
   }
 
   async completeTask(id: number): Promise<Task | undefined> {
     const task = await this.getTask(id);
-    if (!task) return undefined;
+    if (!task || task.isCompleted) return undefined;
 
-    const completedTask = { 
-      ...task, 
-      isCompleted: true, 
-      completedAt: new Date() 
-    };
-    this.tasks.set(id, completedTask);
+    const [completedTask] = await db
+      .update(tasks)
+      .set({ isCompleted: true, completedAt: new Date() })
+      .where(eq(tasks.id, id))
+      .returning();
+    
     return completedTask;
   }
 
   // Daily Goal methods
   async getDailyGoals(userId: number): Promise<DailyGoal[]> {
-    return Array.from(this.dailyGoals.values()).filter(
-      (goal) => goal.userId === userId
-    );
+    return await db
+      .select()
+      .from(dailyGoals)
+      .where(eq(dailyGoals.userId, userId))
+      .orderBy(dailyGoals.id);
   }
 
   async createDailyGoal(insertGoal: InsertDailyGoal): Promise<DailyGoal> {
-    const id = this.goalIdCounter++;
-    const goal: DailyGoal = {
-      ...insertGoal,
-      id,
-      isCompleted: false,
-      createdAt: new Date()
-    };
-    this.dailyGoals.set(id, goal);
+    const [goal] = await db
+      .insert(dailyGoals)
+      .values(insertGoal)
+      .returning();
     return goal;
   }
 
   async completeDailyGoal(id: number): Promise<DailyGoal | undefined> {
-    const goal = this.dailyGoals.get(id);
-    if (!goal) return undefined;
+    const [goal] = await db.select().from(dailyGoals).where(eq(dailyGoals.id, id));
+    if (!goal || goal.isCompleted) return undefined;
 
-    const completedGoal = { ...goal, isCompleted: true };
-    this.dailyGoals.set(id, completedGoal);
+    const [completedGoal] = await db
+      .update(dailyGoals)
+      .set({ isCompleted: true, completedAt: new Date() })
+      .where(eq(dailyGoals.id, id))
+      .returning();
+    
     return completedGoal;
   }
 
   async resetDailyGoals(userId: number): Promise<boolean> {
-    const goals = await this.getDailyGoals(userId);
-    goals.forEach(goal => {
-      const resetGoal = { ...goal, isCompleted: false };
-      this.dailyGoals.set(goal.id, resetGoal);
-    });
+    await db
+      .update(dailyGoals)
+      .set({ isCompleted: false, completedAt: null })
+      .where(eq(dailyGoals.userId, userId));
+    
     return true;
   }
 
   // Reward methods
   async getRewards(userId: number): Promise<Reward[]> {
-    return Array.from(this.rewards.values()).filter(
-      (reward) => reward.userId === userId
-    );
+    return await db
+      .select()
+      .from(rewards)
+      .where(eq(rewards.userId, userId))
+      .orderBy(rewards.id);
   }
 
   async createReward(insertReward: InsertReward): Promise<Reward> {
-    const id = this.rewardIdCounter++;
-    const reward: Reward = {
-      ...insertReward,
-      id,
-      isUnlocked: false,
-      createdAt: new Date()
-    };
-    this.rewards.set(id, reward);
+    const [reward] = await db
+      .insert(rewards)
+      .values(insertReward)
+      .returning();
     return reward;
   }
 
   async unlockReward(id: number): Promise<Reward | undefined> {
-    const reward = this.rewards.get(id);
+    const [reward] = await db.select().from(rewards).where(eq(rewards.id, id));
     if (!reward) return undefined;
 
-    const unlockedReward = { ...reward, isUnlocked: true };
-    this.rewards.set(id, unlockedReward);
+    const [unlockedReward] = await db
+      .update(rewards)
+      .set({ 
+        lastUnlocked: new Date(),
+        timesUnlocked: (reward.timesUnlocked || 0) + 1
+      })
+      .where(eq(rewards.id, id))
+      .returning();
+    
     return unlockedReward;
   }
 
   // Mini-game methods
   async getMiniGameScores(userId: number, gameType?: string): Promise<MiniGameScore[]> {
-    let scores = Array.from(this.miniGameScores.values()).filter(
-      (score) => score.userId === userId
-    );
-    
     if (gameType) {
-      scores = scores.filter(score => score.gameType === gameType);
+      return await db
+        .select()
+        .from(miniGameScores)
+        .where(
+          and(
+            eq(miniGameScores.userId, userId),
+            eq(miniGameScores.gameType, gameType)
+          )
+        )
+        .orderBy(desc(miniGameScores.createdAt));
+    } else {
+      return await db
+        .select()
+        .from(miniGameScores)
+        .where(eq(miniGameScores.userId, userId))
+        .orderBy(desc(miniGameScores.createdAt));
     }
-    
-    return scores;
   }
 
   async createMiniGameScore(insertScore: InsertMiniGameScore): Promise<MiniGameScore> {
-    const id = this.scoreIdCounter++;
-    const score: MiniGameScore = {
-      ...insertScore,
-      id,
-      playedAt: new Date()
-    };
-    this.miniGameScores.set(id, score);
+    const [score] = await db
+      .insert(miniGameScores)
+      .values(insertScore)
+      .returning();
     return score;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
