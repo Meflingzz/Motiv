@@ -121,47 +121,54 @@ export default function TaskList({ tasks, userId, showCompleted = true, onDelete
             task.isCompleted ? "opacity-80" : ""
           }`}
         >
-          <div className="flex items-center">
-            <div className="flex-shrink-0 mr-3">
+          <div className="flex items-start">
+            <div className="flex-shrink-0 mr-3 mt-1">
               {task.isCompleted ? (
-                <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center text-white border-2 border-secondary shadow-sm">
-                  <Check className="h-4 w-4" />
+                <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-white border-2 border-secondary shadow-sm">
+                  <Check className="h-3.5 w-3.5" />
                 </div>
               ) : (
                 <button 
-                  className="w-7 h-7 rounded-full border-2 border-primary hover:bg-primary/10 transition-all shadow-sm"
+                  className="w-6 h-6 rounded-full border-2 border-primary hover:bg-primary/10 transition-all shadow-sm"
                   onClick={(e) => completeTask(task.id, task.coinReward, e)}
+                  aria-label="Отметить как выполненное"
                 />
               )}
             </div>
-            <div className="flex-1">
-              <h3 className={`font-medium text-gray-800 ${
+            <div className="flex-1 min-w-0">
+              <h3 className={`font-medium text-gray-800 break-words ${
                 task.isCompleted ? "line-through text-gray-500" : ""
               }`}>
                 {task.title}
               </h3>
-              <div className="flex items-center text-sm text-gray-500 mt-1">
-                <Clock className="h-3 w-3 mr-1" />
-                <span>
-                  {task.dueDate 
-                    ? `${formatTimeOnly(task.dueDate)}`
-                    : "Нет срока"}
-                </span>
-                <span className="mx-2">•</span>
-                <span className="flex items-center font-medium text-accent">
-                  <Coins className="h-3 w-3 mr-1" /> {task.coinReward}
-                </span>
+              <div className="flex flex-wrap items-center text-xs sm:text-sm text-gray-500 mt-1 gap-1">
+                <div className="flex items-center">
+                  <Clock className="h-3 w-3 mr-1 flex-shrink-0" />
+                  <span className="whitespace-nowrap">
+                    {task.dueDate 
+                      ? `${formatTimeOnly(task.dueDate)}`
+                      : "Нет срока"}
+                  </span>
+                </div>
+                <span className="hidden sm:inline mx-1">•</span>
+                <div className="flex items-center font-medium text-accent whitespace-nowrap">
+                  <Coins className="h-3 w-3 mr-1 flex-shrink-0" /> 
+                  {task.coinReward}
+                </div>
               </div>
             </div>
             <div className="flex-shrink-0 ml-2">
               {task.isCompleted ? (
-                <span className="text-xs font-medium py-1 px-3 bg-secondary/10 text-secondary rounded-full">
+                <span className="text-xs font-medium py-1 px-2 bg-secondary/10 text-secondary rounded-full whitespace-nowrap">
                   Выполнено
                 </span>
               ) : (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="text-gray-400 hover:text-primary transition-colors p-1 rounded-full hover:bg-gray-50">
+                    <button 
+                      className="text-gray-400 hover:text-primary transition-colors p-1 rounded-full hover:bg-gray-50"
+                      aria-label="Опции задачи"
+                    >
                       <MoreVertical className="h-5 w-5" />
                     </button>
                   </DropdownMenuTrigger>

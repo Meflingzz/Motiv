@@ -17,8 +17,8 @@ export default function Header({ userId }: HeaderProps) {
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <Link href="/">
           <div className="flex items-center cursor-pointer">
-            <Gamepad className="text-white mr-2 h-7 w-7" />
-            <h1 className="text-white font-nunito font-bold text-2xl">ФокусИгра</h1>
+            <Gamepad className="text-white mr-2 h-6 w-6" />
+            <h1 className="text-white font-nunito font-bold text-2xl">Focus</h1>
           </div>
         </Link>
         

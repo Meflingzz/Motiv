@@ -94,9 +94,9 @@ export default function MiniGames({ userId }: MiniGamesProps) {
       ) : activeGame === "puzzle" ? (
         <PuzzleGame onClose={() => setActiveGame(null)} />
       ) : (
-        <div className="grid md:grid-cols-2 gap-5">
+        <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <div className="mb-4">
+            <div className="mb-5">
               <MiniGameCard
                 title="Игра на память"
                 description="Проверьте свою память, сопоставляя пары карточек"
@@ -107,23 +107,23 @@ export default function MiniGames({ userId }: MiniGamesProps) {
                 onPlay={() => setActiveGame("memory")}
               />
               
-              <Card className="mt-4 border border-gray-100">
-                <CardContent className="py-5">
-                  <div className="grid grid-cols-3 gap-4 text-sm">
-                    <div className="flex flex-col items-center bg-gray-50 p-3 rounded-lg">
+              <Card className="mt-3 border border-gray-100">
+                <CardContent className="py-4">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4 text-sm">
+                    <div className="flex flex-col items-center bg-gray-50 p-2 sm:p-3 rounded-lg">
                       <Trophy className="h-4 w-4 text-primary mb-1" />
-                      <p className="text-gray-500 text-xs">Лучший счет</p>
-                      <p className="font-medium">{memoryBestScore} очков</p>
+                      <p className="text-gray-500 text-[0.65rem] sm:text-xs">Лучший счет</p>
+                      <p className="font-medium text-xs sm:text-sm">{memoryBestScore} очк.</p>
                     </div>
-                    <div className="flex flex-col items-center bg-gray-50 p-3 rounded-lg">
+                    <div className="flex flex-col items-center bg-gray-50 p-2 sm:p-3 rounded-lg">
                       <Calendar className="h-4 w-4 text-primary mb-1" />
-                      <p className="text-gray-500 text-xs">Игр сегодня</p>
-                      <p className="font-medium">{memoryPlaysToday}/3</p>
+                      <p className="text-gray-500 text-[0.65rem] sm:text-xs">Игр сегодня</p>
+                      <p className="font-medium text-xs sm:text-sm">{memoryPlaysToday}/3</p>
                     </div>
-                    <div className="flex flex-col items-center bg-gray-50 p-3 rounded-lg">
+                    <div className="flex flex-col items-center bg-gray-50 p-2 sm:p-3 rounded-lg">
                       <Coins className="h-4 w-4 text-accent mb-1" />
-                      <p className="text-gray-500 text-xs">Монет сегодня</p>
-                      <p className="font-medium">{memoryCoinsToday}</p>
+                      <p className="text-gray-500 text-[0.65rem] sm:text-xs">Монет</p>
+                      <p className="font-medium text-xs sm:text-sm">{memoryCoinsToday}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -132,7 +132,7 @@ export default function MiniGames({ userId }: MiniGamesProps) {
           </div>
           
           <div>
-            <div className="mb-4">
+            <div className="mb-5">
               <MiniGameCard
                 title="Скорость реакции"
                 description="Проверьте свою реакцию, нажимая как можно быстрее"
@@ -143,23 +143,23 @@ export default function MiniGames({ userId }: MiniGamesProps) {
                 onPlay={() => setActiveGame("reaction")}
               />
               
-              <Card className="mt-4 border border-gray-100">
-                <CardContent className="py-5">
-                  <div className="grid grid-cols-3 gap-4 text-sm">
-                    <div className="flex flex-col items-center bg-gray-50 p-3 rounded-lg">
+              <Card className="mt-3 border border-gray-100">
+                <CardContent className="py-4">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4 text-sm">
+                    <div className="flex flex-col items-center bg-gray-50 p-2 sm:p-3 rounded-lg">
                       <Trophy className="h-4 w-4 text-secondary mb-1" />
-                      <p className="text-gray-500 text-xs">Лучший счет</p>
-                      <p className="font-medium">{reactionBestScore} мс</p>
+                      <p className="text-gray-500 text-[0.65rem] sm:text-xs">Лучший счет</p>
+                      <p className="font-medium text-xs sm:text-sm">{reactionBestScore} мс</p>
                     </div>
-                    <div className="flex flex-col items-center bg-gray-50 p-3 rounded-lg">
+                    <div className="flex flex-col items-center bg-gray-50 p-2 sm:p-3 rounded-lg">
                       <Calendar className="h-4 w-4 text-secondary mb-1" />
-                      <p className="text-gray-500 text-xs">Игр сегодня</p>
-                      <p className="font-medium">{reactionPlaysToday}/3</p>
+                      <p className="text-gray-500 text-[0.65rem] sm:text-xs">Игр сегодня</p>
+                      <p className="font-medium text-xs sm:text-sm">{reactionPlaysToday}/3</p>
                     </div>
-                    <div className="flex flex-col items-center bg-gray-50 p-3 rounded-lg">
+                    <div className="flex flex-col items-center bg-gray-50 p-2 sm:p-3 rounded-lg">
                       <Coins className="h-4 w-4 text-accent mb-1" />
-                      <p className="text-gray-500 text-xs">Монет сегодня</p>
-                      <p className="font-medium">{reactionCoinsToday}</p>
+                      <p className="text-gray-500 text-[0.65rem] sm:text-xs">Монет</p>
+                      <p className="font-medium text-xs sm:text-sm">{reactionCoinsToday}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -168,7 +168,7 @@ export default function MiniGames({ userId }: MiniGamesProps) {
           </div>
           
           <div>
-            <div className="mb-4">
+            <div className="mb-5">
               <MiniGameCard
                 title="Пятнашки"
                 description="Расставьте числа по порядку"
@@ -179,23 +179,23 @@ export default function MiniGames({ userId }: MiniGamesProps) {
                 onPlay={() => setActiveGame("puzzle")}
               />
               
-              <Card className="mt-4 border border-gray-100">
-                <CardContent className="py-5">
-                  <div className="grid grid-cols-3 gap-4 text-sm">
-                    <div className="flex flex-col items-center bg-gray-50 p-3 rounded-lg">
+              <Card className="mt-3 border border-gray-100">
+                <CardContent className="py-4">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4 text-sm">
+                    <div className="flex flex-col items-center bg-gray-50 p-2 sm:p-3 rounded-lg">
                       <Trophy className="h-4 w-4 text-amber-600 mb-1" />
-                      <p className="text-gray-500 text-xs">Лучший счет</p>
-                      <p className="font-medium">{puzzleBestScore} очков</p>
+                      <p className="text-gray-500 text-[0.65rem] sm:text-xs">Лучший счет</p>
+                      <p className="font-medium text-xs sm:text-sm">{puzzleBestScore} очк.</p>
                     </div>
-                    <div className="flex flex-col items-center bg-gray-50 p-3 rounded-lg">
+                    <div className="flex flex-col items-center bg-gray-50 p-2 sm:p-3 rounded-lg">
                       <Calendar className="h-4 w-4 text-amber-600 mb-1" />
-                      <p className="text-gray-500 text-xs">Игр сегодня</p>
-                      <p className="font-medium">{puzzlePlaysToday}/3</p>
+                      <p className="text-gray-500 text-[0.65rem] sm:text-xs">Игр сегодня</p>
+                      <p className="font-medium text-xs sm:text-sm">{puzzlePlaysToday}/3</p>
                     </div>
-                    <div className="flex flex-col items-center bg-gray-50 p-3 rounded-lg">
+                    <div className="flex flex-col items-center bg-gray-50 p-2 sm:p-3 rounded-lg">
                       <Coins className="h-4 w-4 text-accent mb-1" />
-                      <p className="text-gray-500 text-xs">Монет сегодня</p>
-                      <p className="font-medium">{puzzleCoinsToday}</p>
+                      <p className="text-gray-500 text-[0.65rem] sm:text-xs">Монет</p>
+                      <p className="font-medium text-xs sm:text-sm">{puzzleCoinsToday}</p>
                     </div>
                   </div>
                 </CardContent>
