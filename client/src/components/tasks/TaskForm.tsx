@@ -31,9 +31,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
+import { ru } from "date-fns/locale";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { CalendarIcon, Plus } from "lucide-react";
+import { CalendarIcon, Plus, Coins } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface TaskFormProps {
@@ -72,16 +73,16 @@ export default function TaskForm({ userId }: TaskFormProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/user/${userId}/tasks`] });
       toast({
-        title: "Task created",
-        description: "Your new task has been created successfully.",
+        title: "Задача создана",
+        description: "Ваша новая задача была успешно создана.",
       });
       form.reset();
       setOpen(false);
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to create task. Please try again.",
+        title: "Ошибка",
+        description: "Не удалось создать задачу. Пожалуйста, попробуйте снова.",
         variant: "destructive",
       });
     },
@@ -94,15 +95,15 @@ export default function TaskForm({ userId }: TaskFormProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="game-button shadow-button bg-primary text-white rounded-full p-2 h-auto w-auto">
+        <Button className="game-button shadow-button bg-primary text-white rounded-full p-3 h-auto w-auto">
           <Plus className="h-5 w-5" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[450px] border-gray-100">
         <DialogHeader>
-          <DialogTitle>Create New Task</DialogTitle>
+          <DialogTitle className="text-xl">Создать новую задачу</DialogTitle>
           <DialogDescription>
-            Add a new task and set a coin reward for completing it.
+            Добавьте новую задачу и установите награду за её выполнение.
           </DialogDescription>
         </DialogHeader>
 
@@ -113,9 +114,9 @@ export default function TaskForm({ userId }: TaskFormProps) {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Task Title</FormLabel>
+                  <FormLabel>Название задачи</FormLabel>
                   <FormControl>
-                    <Input placeholder="What do you need to do?" {...field} />
+                    <Input placeholder="Что нужно сделать?" {...field} className="border-gray-200 focus-visible:ring-primary" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -127,11 +128,12 @@ export default function TaskForm({ userId }: TaskFormProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description (Optional)</FormLabel>
+                  <FormLabel>Описание (опционально)</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Add more details about this task..."
+                      placeholder="Добавьте подробности о задаче..."
                       {...field}
+                      className="border-gray-200 focus-visible:ring-primary"
                     />
                   </FormControl>
                   <FormMessage />
@@ -144,21 +146,21 @@ export default function TaskForm({ userId }: TaskFormProps) {
               name="dueDate"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Due Date (Optional)</FormLabel>
+                  <FormLabel>Срок выполнения (опционально)</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
                           variant={"outline"}
                           className={cn(
-                            "w-full pl-3 text-left font-normal",
+                            "w-full pl-3 text-left font-normal border-gray-200",
                             !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value ? (
-                            format(field.value, "PPP")
+                            format(field.value, "dd MMMM yyyy", { locale: ru })
                           ) : (
-                            <span>Pick a date</span>
+                            <span>Выберите дату</span>
                           )}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
@@ -170,6 +172,7 @@ export default function TaskForm({ userId }: TaskFormProps) {
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
+                        locale={ru}
                       />
                     </PopoverContent>
                   </Popover>
@@ -183,28 +186,42 @@ export default function TaskForm({ userId }: TaskFormProps) {
               name="coinReward"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Coin Reward</FormLabel>
+                  <FormLabel>Награда в монетах</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      min={1}
-                      max={100}
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                    />
+                    <div className="relative">
+                      <Input
+                        type="number"
+                        min={1}
+                        max={100}
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        className="pl-10 border-gray-200 focus-visible:ring-primary"
+                      />
+                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                        <Coins className="h-4 w-4 text-accent" />
+                      </div>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <DialogFooter>
+            <DialogFooter className="pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+                className="border-gray-200"
+              >
+                Отмена
+              </Button>
               <Button
                 type="submit"
                 className="game-button shadow-button bg-primary text-white"
                 disabled={createMutation.isPending}
               >
-                {createMutation.isPending ? "Creating..." : "Create Task"}
+                {createMutation.isPending ? "Создание..." : "Создать задачу"}
               </Button>
             </DialogFooter>
           </form>
