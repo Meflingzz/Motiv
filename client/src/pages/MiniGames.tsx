@@ -3,15 +3,16 @@ import { useQuery } from "@tanstack/react-query";
 import MiniGameCard from "@/components/minigames/MiniGameCard";
 import MemoryGame from "@/components/minigames/MemoryGame";
 import ReactionGame from "@/components/minigames/ReactionGame";
+import PuzzleGame from "@/components/minigames/PuzzleGame";
 import { Card, CardContent } from "@/components/ui/card";
-import { Brain, Trophy, Calendar, Coins, Zap, Info } from "lucide-react";
+import { Brain, Trophy, Calendar, Coins, Zap, Info, Puzzle } from "lucide-react";
 
 interface MiniGamesProps {
   userId: number;
 }
 
 export default function MiniGames({ userId }: MiniGamesProps) {
-  const [activeGame, setActiveGame] = useState<"memory" | "reaction" | null>(null);
+  const [activeGame, setActiveGame] = useState<"memory" | "reaction" | "puzzle" | null>(null);
   
   const { data: scores = [] } = useQuery({
     queryKey: [`/api/user/${userId}/mini-game-scores`],
@@ -23,6 +24,10 @@ export default function MiniGames({ userId }: MiniGamesProps) {
     
   const reactionBestScore = scores
     .filter((score: any) => score.gameType === "reaction")
+    .reduce((max: number, score: any) => Math.max(max, score.score), 0);
+
+  const puzzleBestScore = scores
+    .filter((score: any) => score.gameType === "puzzle")
     .reduce((max: number, score: any) => Math.max(max, score.score), 0);
   
   const todaysMemoryScores = scores
